@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors'
-import eventRoute from './routes/eventRoute';
-import CategoryRoute from './routes/categoryRoute';
-import speakerRoute from './routes/speakerRoute';
+import eventRoute from './routes/eventRoute.js';
+import CategoryRoute from './routes/categoryRoute.js';
+import speakerRoute from './routes/speakerRoute.js';
 
 
 

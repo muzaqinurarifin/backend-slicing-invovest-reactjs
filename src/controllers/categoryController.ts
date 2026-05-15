@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Category } from "../types/category";
+import { Category } from "../types/category.js";
 
 let categories: Category[] = [];
 

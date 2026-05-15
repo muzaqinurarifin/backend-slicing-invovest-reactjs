@@ -5,7 +5,7 @@ import {
   getSpeakerById,
   UpdateSpeaker,
   DeleteSpeaker,
-} from "../controllers/speakerController";
+} from "../controllers/speakerController.js";
 
 const router = Router();
 

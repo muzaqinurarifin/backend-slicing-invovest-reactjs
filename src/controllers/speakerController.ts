@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Speaker } from "../types/speaker";
+import { Speaker } from "../types/speaker.js";
 
 let speakers: Speaker[] = [];
 
