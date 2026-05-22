@@ -25,29 +25,38 @@ export const getEvents = async (req: Request, res: Response) => {
 //2. menyimpan data
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    //jika berhasil
     const { name, categoryId, location, dateEvent, description } = req.body;
 
-    //tambahkan validasi
+    if (!name || !dateEvent || !categoryId) {
+      return res
+        .status(400)
+        .json({ message: "Nama, kategori, dan tanggal event wajib diisi" });
+    }
 
-    //simpan data
+    const categoryIdNumber = Number(categoryId);
+    const categoryExists = await prisma.category.findUnique({
+      where: { id: categoryIdNumber },
+    });
+
+    if (!categoryExists) {
+      return res.status(400).json({ message: "Kategori tidak ditemukan" });
+    }
+
     const newEvent = await prisma.event.create({
       data: {
-        name,
-        categoryId,
-        location,
+        name: name.trim(),
+        categoryId: String(categoryIdNumber),
+        location: location ? location.trim() : "",
         dateEvent: new Date(dateEvent),
-        description,
+        description: description ? description.trim() : "",
       },
     });
 
-    //kasih tau ke user
     res.status(201).json({
       message: "Data event berhasil disimpan",
       data: newEvent,
     });
   } catch (error) {
-    //jika ada error
     res.status(500).json({ message: "Gagal membuat event", error });
   }
 };
@@ -71,20 +80,37 @@ export const getEventById = async (req: Request, res: Response) => {
 };
 
 //4. mengupdate data berdasarkan id
-export const UpdateEvent = async (req: Request, res: Response) => {
+export const updateEvent = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     const { name, categoryId, location, dateEvent, description } = req.body;
 
+    const updateData: any = {
+      name: name?.trim(),
+      location: location?.trim(),
+      description: description?.trim(),
+    };
+
+    if (categoryId) {
+      const categoryIdNumber = Number(categoryId);
+      const categoryExists = await prisma.category.findUnique({
+        where: { id: categoryIdNumber },
+      });
+
+      if (!categoryExists) {
+        return res.status(400).json({ message: "Kategori tidak ditemukan" });
+      }
+
+      updateData.categoryId = String(categoryIdNumber);
+    }
+
+    if (dateEvent) {
+      updateData.dateEvent = new Date(dateEvent);
+    }
+
     const updatedEvent = await prisma.event.update({
       where: { id },
-      data: {
-        name,
-        categoryId,
-        location,
-        dateEvent: dateEvent ? new Date(dateEvent) : undefined,
-        description,
-      },
+      data: updateData,
     });
 
     res.json({ message: "Data event berhasil diupdate", data: updatedEvent });

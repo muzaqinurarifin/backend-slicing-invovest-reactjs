@@ -3,8 +3,8 @@ import {
   getSpeakers,
   createSpeaker,
   getSpeakerById,
-  UpdateSpeaker,
-  DeleteSpeaker,
+  updateSpeaker,
+  deleteSpeaker,
 } from "../controllers/speakerController.js";
 
 const router = Router();
@@ -12,7 +12,7 @@ const router = Router();
 router.get("/", getSpeakers);
 router.post("/", createSpeaker);
 router.get("/:id", getSpeakerById);
-router.put("/:id", UpdateSpeaker);
-router.delete("/:id", DeleteSpeaker);
+router.put("/:id", updateSpeaker);
+router.delete("/:id", deleteSpeaker);
 
 export default router;

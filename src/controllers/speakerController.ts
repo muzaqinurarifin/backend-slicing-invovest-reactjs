@@ -1,66 +1,90 @@
 import { Request, Response } from "express";
-import { Speaker } from "../types/speaker.js";
+import { prisma } from "../lib/db.js";
 
-let speakers: Speaker[] = [];
-
-// menampilkan data speaker
-export const getSpeakers = (req: Request, res: Response) => {
-  res.json(speakers);
+export const getSpeakers = async (req: Request, res: Response) => {
+  try {
+    const speakers = await prisma.speaker.findMany({
+      orderBy: { id: "asc" },
+    });
+    res.json(speakers);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal mengambil speaker", error });
+  }
 };
 
-// menyimpan data speaker
-export const createSpeaker = (req: Request, res: Response) => {
-  const { name, bio } = req.body;
+export const createSpeaker = async (req: Request, res: Response) => {
+  try {
+    const { name, role, image } = req.body;
 
-  if (!name || !bio) {
-    return res.status(400).json({ message: "Nama dan bio harus diisi" });
+    if (!name || !role || !image) {
+      return res
+        .status(400)
+        .json({ message: "Nama, peran, dan gambar speaker wajib diisi" });
+    }
+
+    const newSpeaker = await prisma.speaker.create({
+      data: {
+        name: name.trim(),
+        role: role.trim(),
+        image: image.trim(),
+      },
+    });
+
+    res.status(201).json(newSpeaker);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal membuat speaker", error });
   }
-
-  const newSpeaker: Speaker = {
-    id: Date.now(),
-    name: name,
-    bio: bio,
-  };
-
-  speakers.push(newSpeaker);
-  res.status(201).json(newSpeaker);
 };
 
-// menampilkan data speaker by id
-export const getSpeakerById = (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  const speaker = speakers.find((s) => s.id === id);
+export const getSpeakerById = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const speaker = await prisma.speaker.findUnique({
+      where: { id },
+    });
 
-  if (!speaker) {
-    return res.status(404).json({ message: "Speaker tidak ditemukan" });
+    if (!speaker) {
+      return res.status(404).json({ message: "Speaker tidak ditemukan" });
+    }
+
+    res.json(speaker);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal mengambil speaker", error });
   }
-
-  res.json(speaker);
 };
 
-// mengupdate data speaker by id
-export const UpdateSpeaker = (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  const { name, bio } = req.body;
-  const index = speakers.findIndex((s) => s.id === id);
+export const updateSpeaker = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const { name, role, image } = req.body;
 
-  if (index === -1) {
-    return res.status(404).json({ message: "Speaker tidak ditemukan" });
+    if (!name || !role || !image) {
+      return res
+        .status(400)
+        .json({ message: "Nama, peran, dan gambar speaker wajib diisi" });
+    }
+
+    const updatedSpeaker = await prisma.speaker.update({
+      where: { id },
+      data: {
+        name: name.trim(),
+        role: role.trim(),
+        image: image.trim(),
+      },
+    });
+
+    res.json(updatedSpeaker);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal mengupdate speaker", error });
   }
-
-  speakers[index] = { ...speakers[index]!, name, bio };
-  res.json(speakers[index]);
 };
 
-// menghapus data speaker by id
-export const DeleteSpeaker = (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  const index = speakers.findIndex((s) => s.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ message: "Speaker tidak ditemukan" });
+export const deleteSpeaker = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.speaker.delete({ where: { id } });
+    res.json({ message: "Speaker berhasil dihapus" });
+  } catch (error) {
+    res.status(500).json({ message: "Gagal menghapus speaker", error });
   }
-
-  speakers.splice(index, 1);
-  res.json({ message: "Speaker berhasil dihapus" });
 };
