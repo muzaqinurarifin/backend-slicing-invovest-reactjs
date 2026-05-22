@@ -10,23 +10,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const whitelist = [
-  "https://slicing-invovest-reactjs.vercel.app",
-  "https://invovest.vercel.app",
-  "http://localhost:5173",
-  "http://localhost:3000",
-];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow non-browser requests (curl, server-to-server)
-      if (whitelist.indexOf(origin) !== -1) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"));
+    origin: function (origin, callback) {
+      // Mengizinkan request dari Postman (!origin), localhost, dan semua domain vercel.app
+      if (!origin || origin.includes("localhost") || origin.includes("vercel.app")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    // Pastikan "OPTIONS" ditambahkan di sini untuk mengatasi "preflight request"
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
     credentials: true,
-  }),
+  })
 );
 app.use(express.json());
 
