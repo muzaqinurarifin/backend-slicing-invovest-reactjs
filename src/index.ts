@@ -10,7 +10,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://slicing-invovest-reactjs.vercel.app/", // Masukkan URL Vercel kamu
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // Jika menggunakan cookies/session
+  })
+);
 app.use(express.json());
 
 app.get("/", (req, res) => {
