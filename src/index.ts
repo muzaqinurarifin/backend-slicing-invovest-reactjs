@@ -4,6 +4,8 @@ import cors from "cors";
 import eventRoute from "./routes/eventRoute.js";
 import CategoryRoute from "./routes/categoryRoute.js";
 import speakerRoute from "./routes/speakerRoute.js";
+import authRoute from "./routes/authRoute.js";
+import userRoute from "./routes/userRoute.js";
 
 dotenv.config();
 
@@ -13,17 +15,19 @@ const PORT = process.env.PORT || 3000;
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Mengizinkan request dari Postman (!origin), localhost, dan semua domain vercel.app
-      if (!origin || origin.includes("localhost") || origin.includes("vercel.app")) {
+      if (
+        !origin ||
+        origin.includes("localhost") ||
+        origin.includes("vercel.app")
+      ) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
       }
     },
-    // Pastikan "OPTIONS" ditambahkan di sini untuk mengatasi "preflight request"
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 
@@ -34,6 +38,8 @@ app.get("/", (req, res) => {
 app.use("/events", eventRoute);
 app.use("/categories", CategoryRoute);
 app.use("/speakers", speakerRoute);
+app.use("/users", userRoute);
+app.use("/auth", authRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
