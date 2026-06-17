@@ -6,13 +6,14 @@ import {
   updateCategory,
   deleteCategory,
 } from "../controllers/categoryController.js";
+import { authenticate } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
 router.get("/", getCategory);
-router.post("/", createCategory);
+router.post("/",authenticate, createCategory);
 router.get("/:id", getCategoryById);
-router.put("/:id", updateCategory);
-router.delete("/:id", deleteCategory);
+router.put("/:id",authenticate, updateCategory);
+router.delete("/:id",authenticate, deleteCategory);
 
 export default router;
